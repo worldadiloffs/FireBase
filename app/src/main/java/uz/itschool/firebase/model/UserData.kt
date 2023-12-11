@@ -1,6 +1,11 @@
 package uz.itschool.firebase.model
 
-data class UserData(var name: String?, var uid: String?, var email: String?, var image: String?){
+data class UserData(
+    var name: String? = null,
+    var uid: String? = null,
+    var email: String? = null,
+    var photo: String? = null,
+) {
 
     constructor() : this(null, null, null, null)
 }

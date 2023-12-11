@@ -58,11 +58,6 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        val user = FirebaseAuth.getInstance().currentUser
-                        if (user != null){
-                            val userData = getUserInfo(user)
-                            Image(painter = userData.image, contentDescription = )
-                        }
                         Button(onClick = {
                             val signInIntent = mGoogleSignInClient.signInIntent
                             startActivityForResult(signInIntent, 1)
@@ -81,18 +76,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-    @Composable
-    fun ProfilePicture(url: String?) {
-
-
-        Image(
-            bitmap = image,
-            contentDescription = "Profile Picture",
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
