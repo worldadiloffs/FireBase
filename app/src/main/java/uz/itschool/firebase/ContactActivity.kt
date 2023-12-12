@@ -58,7 +58,7 @@ class ContactActivity : ComponentActivity() {
                             userList.clear()
                             children.forEach {
                                 val user = it.getValue(UserData::class.java)
-                                if (user != null && user.uid != uid){
+                                if (user != null && user.uid == uid){
                                     userList.add(user ?: UserData())
                                 }
                             }
