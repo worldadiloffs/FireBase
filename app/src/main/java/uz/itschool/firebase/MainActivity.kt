@@ -5,24 +5,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.unit.dp
-import coil.Coil
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -40,7 +31,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FireBaseTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -61,6 +51,7 @@ class MainActivity : ComponentActivity() {
                         Button(onClick = {
                             val signInIntent = mGoogleSignInClient.signInIntent
                             startActivityForResult(signInIntent, 1)
+
                         }) {
                             Text(text = "Sign In Google")
                         }
@@ -83,13 +74,11 @@ class MainActivity : ComponentActivity() {
         if (requestCode == 1) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
-                // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)
                 firebaseAuthWithGoogle(account.idToken)
                 Log.d("TAG", "onActivityResult: ")
             } catch (e: ApiException) {
                 Log.d("TAG", "error: $e")
-                // Google Sign In failed, update UI appropriately
             }
         }
     }
@@ -116,18 +105,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setUser(userData: UserData) {
-        userData?.run {
             val userIdReference = Firebase.database.reference
-                .child("users").child(userData.uid?:"")
-            userIdReference.setValue(userData)
+                .child("users").child(userData.uid ?: "")
+            userIdReference.setValue(userData).addOnSuccessListener {
+                val i = Intent(this@MainActivity, ContactActivity::class.java)
+                i.putExtra("uid", userData.uid)
+                startActivity(i)
         }
-    }
-
-    fun getUserInfo(currentUser: FirebaseUser): UserData {
-        val name = currentUser.displayName
-        val email = currentUser.email
-        val photoUrl = currentUser.photoUrl
-
-        return UserData(name, currentUser.uid, email, photoUrl.toString())
     }
 }

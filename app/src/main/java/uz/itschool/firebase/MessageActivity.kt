@@ -89,7 +89,7 @@ class MessageActivity : ComponentActivity() {
 
                     })
 
-                    val m = Message(useruid, uid, text.value.text, "11.12.2023 12:50")
+                    val m = Message(useruid, uid, text.value.text, "12.12.2023 12:50")
                     Row {
                         TextField(
                             text.value,
