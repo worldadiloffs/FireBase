@@ -20,6 +20,9 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import uz.itschool.firebase.model.UserData
@@ -96,7 +99,33 @@ class MainActivity : ComponentActivity() {
                         user?.email,
                         user?.photoUrl.toString()
                     )
-                    setUser(userData)
+                    val reference = Firebase.database.reference.child("users")
+                    var b = true
+                    reference.addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val children = snapshot.children
+                            children.forEach {
+                                val user = it.getValue(UserData::class.java)
+                                if (user != null && user.uid == userData.uid) {
+                                    b = false
+                                }
+                            }
+                            if (b) {
+                                setUser(userData)
+                            }
+
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            Log.d("TAG", "onCancelled: ${error.message}")
+                        }
+
+                    })
+
+                    val i = Intent(this, ContactActivity::class.java)
+                    i.putExtra("uid", userData.uid)
+                    startActivity(i)
+
 
                 } else {
                     Log.d("TAG", "error: Authentication Failed.")
@@ -105,12 +134,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setUser(userData: UserData) {
-            val userIdReference = Firebase.database.reference
-                .child("users").child(userData.uid ?: "")
-            userIdReference.setValue(userData).addOnSuccessListener {
-                val i = Intent(this@MainActivity, ContactActivity::class.java)
-                i.putExtra("uid", userData.uid)
-                startActivity(i)
+        val userIdReference = Firebase.database.reference
+            .child("users").child(userData.uid ?: "")
+        userIdReference.setValue(userData).addOnSuccessListener {
+            val i = Intent(this@MainActivity, ContactActivity::class.java)
+            i.putExtra("uid", userData.uid)
+            startActivity(i)
         }
     }
 }
