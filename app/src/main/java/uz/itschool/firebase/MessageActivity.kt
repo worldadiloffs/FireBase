@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +25,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.database.DataSnapshot
@@ -52,28 +57,52 @@ class MessageActivity : ComponentActivity() {
                     val messageList = remember {
                         mutableStateListOf(Message())
                     }
+                    val uid = intent.getStringExtra("uid")
+                    val useruid = intent.getStringExtra("useruid")
+
 
                     var text = remember {
                         mutableStateOf(TextFieldValue(""))
                     }
                     LazyColumn() {
                         items(messageList) {
+                            val backgroundColor = if (it.from == uid) Color.Blue else Color.Gray
+                            val paddingStart =
+                                if (it.from == uid) TextAlign.End else TextAlign.Start
+
                             Row(
                                 Modifier
                                     .fillMaxWidth()
-                                    .padding(10.dp)
-
+                                    .padding(5.dp)
                             ) {
-                                Text(text = it.text ?: "", fontSize = 20.sp)
-                                Text(text = it.date ?:"", Modifier.padding(10.dp),  fontSize = 11.sp)
+                                Box(
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                        .background(
+                                            color = backgroundColor,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(10.dp)
+                                ) {
+                                    Text(
+                                        text = it.text ?: "", color = Color.White,
+                                        fontSize = 16.sp,
+                                        textAlign = paddingStart,
+                                        modifier = Modifier.padding(bottom = 8.dp)
+                                    )
+                                    Text(
+                                        text = it.date ?: "", color = Color.White,
+                                        fontSize = 16.sp,
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier.padding(bottom = 8.dp)
+                                    )
+                                }
+
                             }
 
                         }
                     }
 
-
-                    val uid = intent.getStringExtra("uid")
-                    val useruid = intent.getStringExtra("useruid")
 
                     val ref = Firebase.database.reference.child("users")
                         .child(uid!!)
