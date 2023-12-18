@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -32,6 +32,9 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import uz.itschool.firebase.model.Message
 import uz.itschool.firebase.ui.theme.FireBaseTheme
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 
 private const val TAG = "MessageActivity"
 
@@ -59,8 +62,10 @@ class MessageActivity : ComponentActivity() {
                                 Modifier
                                     .fillMaxWidth()
                                     .padding(10.dp)
+
                             ) {
-                                Text(text = it.text ?: "")
+                                Text(text = it.text ?: "", fontSize = 20.sp)
+                                Text(text = it.date ?:"", Modifier.padding(10.dp),  fontSize = 11.sp)
                             }
 
                         }
@@ -92,10 +97,14 @@ class MessageActivity : ComponentActivity() {
 
                     })
 
-                    val m = Message(useruid, uid, text.value.text, "12.12.2023 12:50")
-                    Row( modifier = Modifier.fillMaxSize(),
+                    val sdf = SimpleDateFormat("HH:mm")
+                    val currentDateAndTime = sdf.format(Date())
+                    val m = Message(useruid, uid, text.value.text, currentDateAndTime)
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.Bottom) {
+                        verticalAlignment = Alignment.Bottom
+                    ) {
                         TextField(
                             text.value,
                             onValueChange = {
@@ -114,6 +123,8 @@ class MessageActivity : ComponentActivity() {
                                 .child(uid ?: "")
                                 .child(key)
                                 .setValue(m)
+
+                            text.value = TextFieldValue("")
                         })
                         {
                             Text(text = "send")
